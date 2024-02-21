@@ -26,7 +26,7 @@ A library used to initialize a basic data table. Includes the main components of
 
 [Sample data structure](#sample-data-structure)
 
-[Demo](#demo-jdatatable)
+[Demo JDataTable](#demo-jdatatable)
 ## Tech Stack
 
 **Language:** HTML, JavaScript.
