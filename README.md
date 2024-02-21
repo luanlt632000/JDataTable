@@ -126,6 +126,11 @@ _Note: The user-declared configuration will be merged with the default configura
 
 | Properties | Type  | Description                                                                                                                                                                                                                         |
 | ---------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| data       | Array    | The array contains data to render when the user wants to pass data directly to the table. By default, the library will receive this `data` variable as rendering data if the user does not declare the config.ajax attribute. |
+| order      | Object   | Columns are sorted by default when initialized. The syntax includes 'order*by*' + column name to sort. Example: `{order_by_id: 'desc'}`                                                                                       |
+| filter     | Object   | Filter based on columns declared in config.heads. Example: `{email: '@gmail.com', name: 'Jonh'}`                                                                                                                              |
+| page       | Number   | Current page. Default is 1.                                                                                                                                                                                                   |
+| per_page   | Number   | Number of lines on the page. Default is 15.                                                                                                                                                                                   |
 | heads      | Array | An array of objects representing the columns of the table. Each object has two fields: `name` (the column name) and `value` (the display title of the column). It can have a `render` field to customize the display of the header. |
 |            |       |                                                                                                                                                                                                                                     |
 
@@ -157,11 +162,6 @@ Example:
 | Properties | Type     | Description                                                                                                                                                                                                                   |
 | ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | rowRender  | Function | A function used to customize the display of each cell in a row. Takes three parameters: `colName` (the column name), `colValue` (the value of the cell), and `row` (the data of the row). Returns an HTML string to display.  |
-| data       | Array    | The array contains data to render when the user wants to pass data directly to the table. By default, the library will receive this `data` variable as rendering data if the user does not declare the config.ajax attribute. |
-| order      | Object   | Columns are sorted by default when initialized. The syntax includes 'order*by*' + column name to sort. Example: `{order_by_id: 'desc'}`                                                                                       |
-| filter     | Object   | Filter based on columns declared in config.heads. Example: `{email: '@gmail.com', name: 'Jonh'}`                                                                                                                              |
-| page       | Number   | Current page. Default is 1.                                                                                                                                                                                                   |
-| per_page   | Number   | Number of lines on the page. Default is 15.                                                                                                                                                                                   |
 
 Example:
 
