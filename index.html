@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>JDataTable</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.0.1/fonts/remixicon.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./JDataTable.js"></script>
+</head>
+
+<body>
+
+    <div class="container mt-3">
+        <h2>JDataTable</h2>
+        <p>A library used to initialize a basic data table. Includes the main components of a data table such as: sorting, per page, pagination, table. Supports additional configuration of search and filtering features.</p>
+
+        <!-- Filter -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Filter</h5>
+                <form id="filterForm">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="text" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="code">Code:</label>
+                        <input type="text" class="form-control" id="code" name="code">
+                    </div>
+                    <button type="button" class="btn btn-primary mt-2" onclick="getFormValues()">Filter</button>
+                </form>
+            </div>
+        </div>
+        <!-- Filter -->
+
+        <!-- Search -->
+        <div class="form-group mb-3">
+            <label for="search_input">Search:</label>
+            <input id="search_input" type="text" class="form-control">
+        </div>
+        <!-- Search -->
+
+        <!-- Table -->
+        <table class="table table-striped table-bordered table-hover" id="bookTabe">
+        </table>
+        <!-- Table -->
+
+        <!-- Pagination -->
+        <div id="pagination"></div>
+        <!-- Pagination -->
+
+    </div>
+
+    <script>
+        var config = {
+            // Declare configuration for table headers
+            // 'render' function is used to customize the header
+            heads: [{
+                name: "id",
+                value: "ID",
+            },
+            {
+                name: "email",
+                value: "Email",
+            },
+            {
+                name: "code",
+                value: "Code",
+                render: (heads) => {
+                    var html = `
+                    <h1>${heads.value}</h1>    
+              `;
+                    return html;
+                },
+            },
+            {
+                name: "created_at",
+                value: "Created at",
+            },
+            {
+                name: "__actions",
+                value: "Action",
+            },
+            ],
+
+            /* data: data, */ //Use data if config.ajax not exist
+
+            // Used to customize rows according to column names
+            rowRender: (colName, colValue, row) => {
+                switch (colName) {
+                    case "id":
+                        return `
+          <div class="text-center">
+            ${row.id}
+          </div>
+        `;
+                    case "email":
+                        return tableData.cellEdit(colName, colValue);
+                    case "code":
+                        return tableData.cellEdit(colName, colValue);
+                    case "__actions":
+                        return tableData.actionEdit(row);
+                    default:
+                        return colValue;
+                }
+            },
+            // Ajax function to automatically get initial data and re-render times
+            // If this parameter is not present, the library will use the default parameter "data" passed directly
+            ajax: (params) => {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: "https://payment.nswteam.net/api/v1/admin/discount/get",
+                        type: "GET",
+                        data: params,
+                        headers: {
+                            Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3BheW1lbnQubnN3dGVhbS5uZXQvYXBpL3YxL2FkbWluL2xvZ2luIiwiaWF0IjoxNzA4NDgxMDUwLCJleHAiOjE3MDg1Njc0NTAsIm5iZiI6MTcwODQ4MTA1MCwianRpIjoid0k3alN1OWxlZHJxM3IwSiIsInN1YiI6IjUiLCJwcnYiOiJkMmZmMjkzMzlhOGEzZTgyYzM1ODJhNWE4ZTczOWRmMTc4OWJiMTJmIn0.8aWr2DlfNvQZqBiXIFaDRS8_VsARAl1TEynsuYpZcqY", // Include the token in the request header
+                        },
+                        success: function (response) {
+                            resolve(response);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            reject(error);
+                        },
+                    });
+                });
+            },
+            // Information used to call the API for the row and cell update function
+            apiUpdate: {
+                url: "https://payment.nswteam.net/api/v1/admin/discount/update",
+                type: "POST",
+                headers: {
+                    Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3BheW1lbnQubnN3dGVhbS5uZXQvYXBpL3YxL2FkbWluL2xvZ2luIiwiaWF0IjoxNzA4NDgxMDUwLCJleHAiOjE3MDg1Njc0NTAsIm5iZiI6MTcwODQ4MTA1MCwianRpIjoid0k3alN1OWxlZHJxM3IwSiIsInN1YiI6IjUiLCJwcnYiOiJkMmZmMjkzMzlhOGEzZTgyYzM1ODJhNWE4ZTczOWRmMTc4OWJiMTJmIn0.8aWr2DlfNvQZqBiXIFaDRS8_VsARAl1TEynsuYpZcqY", // Include the token in the request header
+                },
+            },
+            footer: {
+                pagination: true,
+                detail: true
+            },
+            sort: {
+                enable: true,
+                listColumn: ["id", "email", "code", "created_at"]
+            },
+        };
+
+        // Initial table
+        var tableData = new TableData("#bookTabe", config);
+        tableData.render();
+
+        // Get values from form html and append to config -> re-render with new data
+        const getFormValues = () => {
+            const formData = {};
+            const form = document.getElementById("filterForm");
+
+            for (let i = 0; i < form.elements.length; i++) {
+                const element = form.elements[i];
+
+                if (!element.name || element.tagName === "BUTTON") {
+                    continue;
+                }
+
+                formData[element.name] = element.value;
+            }
+
+            config.filter = formData;
+            tableData.updateConfig(config);
+        };
+
+        // Search for keywords by line (tr tag)
+        $("#search_input").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#bookTabe tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    </script>
+</body>
+
+</html>
