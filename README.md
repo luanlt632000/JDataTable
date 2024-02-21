@@ -26,7 +26,7 @@ A library used to initialize a basic data table. Includes the main components of
 
 [Sample data structure](#sample-data-structure)
 
-[Demo](#demo)
+[Demo](#demo-jdatatable)
 ## Tech Stack
 
 **Language:** HTML, JavaScript.
@@ -45,7 +45,7 @@ Example:
   <table class="table table-striped table-bordered table-hover" id="data_table"></table>
 ```
 
-#### 2. Initialize a _TableData_ class in javascript
+#### 2. Initialize a `TableData` class in javascript
 
 Example:
 
@@ -262,7 +262,7 @@ Example:
 
 Example:
 
-### HTML
+HTML
 
 ```html
 <!-- Filter -->
@@ -291,7 +291,7 @@ Example:
 <!-- Filter -->
 ```
 
-### JS
+JS
 
 ```js
 // Get values from form html and append to config -> re-render with new data
@@ -320,7 +320,7 @@ const getFormValues = () => {
 
 Example:
 
-### HTML
+HTML
 
 ```html
 <!-- Search -->
@@ -331,7 +331,7 @@ Example:
 <!-- Search -->
 ```
 
-### JS
+JS
 
 ```js
 // Search for keywords by line (tr tag)
@@ -665,7 +665,7 @@ rowRender: (colName, colValue, row) => {
 
 ### *Note: The API that retrieves the data must ensure that the data returned is in the correct structure. Additionally, the sorting and filtering functions have been reconfigured. Information on handling APIs will be updated soon!.*
 
-## [Demo](https://jsfiddle.net/joseph_le/eLx17fk9/880/)
+## [Demo JDataTable](https://jsfiddle.net/joseph_le/eLx17fk9/880/)
 
 ## License
 
