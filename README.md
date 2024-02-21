@@ -26,7 +26,7 @@ A library used to initialize a basic data table. Includes the main components of
 
 [Sample data structure](#sample-data-structure)
 
-[Demo JDataTable](#demo-jdatatable)
+[Demo](#demo)
 ## Tech Stack
 
 **Language:** HTML, JavaScript.
@@ -665,8 +665,9 @@ rowRender: (colName, colValue, row) => {
 
 ### *Note: The API that retrieves the data must ensure that the data returned is in the correct structure. Additionally, the sorting and filtering functions have been reconfigured. Information on handling APIs will be updated soon!.*
 
-## [Demo JDataTable](https://jsfiddle.net/joseph_le/eLx17fk9/880/)
+## Demo
 
+[Demo JDataTable](https://jsfiddle.net/joseph_le/eLx17fk9/880/)
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
