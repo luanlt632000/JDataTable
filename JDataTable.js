@@ -374,9 +374,9 @@ class TableData {
           this.notification(`Row update successful`, "success");
           this.render();
         },
-        error: function (error) {
+        error: (error) => {
           console.log(error);
-          this.notification(error, "danger");
+          this.notification(error.responseJSON[0], "danger");
         },
       });
     } else {
