@@ -17,6 +17,7 @@ class TableData {
       enable: false,
       listColumn: [],
     },
+    positionCaption: "top"
   };
 
   constructor(tableId, config) {
@@ -35,19 +36,20 @@ class TableData {
     ) {
       this.config.order = null;
       this.updateConfig(this.config);
+      //   this.attachSortEventListeners(".ri-expand-up-down-fill");
     } else {
       if (this.config.order === null) {
         this.config.order = {
           [`order_by_${column}`]: "desc",
         };
         this.updateConfig(this.config);
-        this.attachSortEventListeners(".ri-arrow-down-s-fill");
+        // this.attachSortEventListeners(".ri-arrow-down-s-fill");
       } else {
         this.config.order = {
           [`order_by_${column}`]: "asc",
         };
         this.updateConfig(this.config);
-        this.attachSortEventListeners(".ri-arrow-up-s-fill");
+        // this.attachSortEventListeners(".ri-arrow-up-s-fill");
       }
     }
   }
@@ -188,20 +190,20 @@ class TableData {
     });
     html += "</tbody>";
     // Initial pagination use 'data.links'
-    let htmlPagination = `<ul class="pagination">`;
+    let htmlPagination = `<ul class="pagination m-0">`;
     data.links.map((link) => {
       htmlPagination += `
-        <li class="page-item ${link.active ? "active" : ""}">
-          <span class="page_number page-link" data-column-name="${
+        <li class="page-item ${link.active ? "active" : ""}" style="width: 30px; height: 30px;">
+          <span class="page_number page-link d-flex align-items-center justify-content-center" data-column-name="${
             link.url !== null ? link.url.split("=")[1] : null
-          }" style="cursor: pointer;">${link.label
+          }" style="cursor: pointer; width: 30px; height: 30px;">${link.label
         .replace(" Previous", "")
         .replace("Next ", "")}</span>
       </li>
     `;
     });
     htmlPagination += "</ul>";
-    html += `<caption>
+    html += `<caption style="caption-side: ${this.config.positionCaption}">
               <div class="d-flex align-items-center" style="justify-content: space-between;">`;
     html += `<div id="perpage">
               <!-- Per page -->
@@ -251,11 +253,21 @@ class TableData {
       per_page: this.config.per_page,
       page: this.config.page,
     };
+    let className = "";
     // Clear html
     $(this.tableId).html("");
     // Initial headers
     $(this.tableId).append(this.renderHeads());
-    this.attachSortEventListeners(".ri-expand-up-down-fill");
+    if (this.config.order === null) {
+      className = ".ri-expand-up-down-fill";
+    } else {
+      if (Object.values(this.config.order)[0] === "asc") {
+        className = ".ri-arrow-up-s-fill";
+      } else {
+        className = ".ri-arrow-down-s-fill";
+      }
+    }
+    this.attachSortEventListeners(className);
 
     // Append 'order' and 'filter' into params if exist
     if (this.config.hasOwnProperty("ajax")) {
@@ -359,11 +371,12 @@ class TableData {
         headers: apiUpdateInfo.headers,
         success: (response) => {
           // alert("Edit success");
+          this.notification(`Row update successful`, "success");
           this.render();
         },
         error: function (error) {
           console.log(error);
-          alert("Edit Fail");
+          this.notification(error, "danger");
         },
       });
     } else {
@@ -379,5 +392,34 @@ class TableData {
   changePerPage() {
     this.config.per_page = $(`${this.tableId} #perPageSelect`).val();
     this.render();
+  }
+
+  // Toast
+  notification(message, theme) {
+    var elementToRemove = document.querySelector(".toasts");
+    if (elementToRemove) {
+      elementToRemove.remove();
+    }
+
+    var div = document.createElement("div");
+    div.classList.add("toasts");
+    div.innerHTML = `
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast text-bg-${theme} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header border-0">
+                <strong class="me-auto text-${theme}">Success</strong>
+                <small>now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body border-0">
+                ${message}
+            </div>
+        </div>
+    </div>
+`;
+    document.body.appendChild(div);
+    const toastLiveExample = document.getElementById("liveToast");
+    const toast = new bootstrap.Toast(toastLiveExample);
+    toast.show();
   }
 }

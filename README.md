@@ -7,11 +7,13 @@ A library used to initialize a basic data table. Includes the main components of
 [Tech Stack](#tech-stack)
 
 [Initialization](#initialization)
+
 - [1. Create a table element in HTML](#1-create-a-table-element-in-html)
 - [2. Initialize a TableData class in javascript](#2-initialize-a-tabledata-class-in-javascript)
 - [3. Render table](#3-render-table)
 
 [Configuration](#configuration)
+
 - [1. Structure of config variable](#1-structure-of-config-variable)
 - [2. Default configuration](#2-default-configuration)
 - [3. Detailed configuration](#3-detailed-configuration)
@@ -21,12 +23,14 @@ A library used to initialize a basic data table. Includes the main components of
 [Search](#search)
 
 [Edit cell content directly](#edit-cell-content-directly)
+
 - [1. Functions to use](#1-functions-to-use)
 - [2. Example](#2-example)
 
 [Sample data structure](#sample-data-structure)
 
 [Demo](#demo)
+
 ## Tech Stack
 
 **Language:** HTML, JavaScript.
@@ -93,6 +97,9 @@ var config = {
   page: 1,
   // Number of lines on the page
   per_page: 15,
+  // Position of caption
+  // Caption includes per page, detail and pagination
+  positionCaption: "",
 };
 ```
 
@@ -117,6 +124,7 @@ config = {
     enable: false,
     listColumn: [],
   },
+  positionCaption: "top",
 };
 ```
 
@@ -124,15 +132,16 @@ _Note: The user-declared configuration will be merged with the default configura
 
 #### 3. Detailed configuration
 
-| Properties | Type  | Description                                                                                                                                                                                                                         |
-| ---------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| data       | Array    | The array contains data to render when the user wants to pass data directly to the table. By default, the library will receive this `data` variable as rendering data if the user does not declare the config.ajax attribute. |
-| order      | Object   | Columns are sorted by default when initialized. The syntax includes 'order*by*' + column name to sort. Example: `{order_by_id: 'desc'}`                                                                                       |
-| filter     | Object   | Filter based on columns declared in config.heads. Example: `{email: '@gmail.com', name: 'Jonh'}`                                                                                                                              |
-| page       | Number   | Current page. Default is 1.                                                                                                                                                                                                   |
-| per_page   | Number   | Number of lines on the page. Default is 15.                                                                                                                                                                                   |
-| heads      | Array | An array of objects representing the columns of the table. Each object has two fields: `name` (the column name) and `value` (the display title of the column). It can have a `render` field to customize the display of the header. |
-|            |       |                                                                                                                                                                                                                                     |
+| Properties      | Type   | Description                                                                                                                                                                                                                         |
+| --------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| data            | Array  | The array contains data to render when the user wants to pass data directly to the table. By default, the library will receive this `data` variable as rendering data if the user does not declare the config.ajax attribute.       |
+| order           | Object | Columns are sorted by default when initialized. The syntax includes 'order*by*' + column name to sort. Example: `{order_by_id: 'desc'}`                                                                                             |
+| filter          | Object | Filter based on columns declared in config.heads. Example: `{email: '@gmail.com', name: 'Jonh'}`                                                                                                                                    |
+| page            | Number | Current page. Default is 1.                                                                                                                                                                                                         |
+| per_page        | Number | Number of lines on the page. Default is 15.                                                                                                                                                                                         |
+| positionCaption | String | Position of caption. Caption includes per page, detail and pagination. Values: `top`, `bottom`.                                                                                                                                     |
+| heads           | Array  | An array of objects representing the columns of the table. Each object has two fields: `name` (the column name) and `value` (the display title of the column). It can have a `render` field to customize the display of the header. |
+|                 |        |                                                                                                                                                                                                                                     |
 
 Example:
 
@@ -159,9 +168,9 @@ Example:
 ];
 ```
 
-| Properties | Type     | Description                                                                                                                                                                                                                   |
-| ---------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| rowRender  | Function | A function used to customize the display of each cell in a row. Takes three parameters: `colName` (the column name), `colValue` (the value of the cell), and `row` (the data of the row). Returns an HTML string to display.  |
+| Properties | Type     | Description                                                                                                                                                                                                                  |
+| ---------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| rowRender  | Function | A function used to customize the display of each cell in a row. Takes three parameters: `colName` (the column name), `colValue` (the value of the cell), and `row` (the data of the row). Returns an HTML string to display. |
 
 Example:
 
@@ -278,11 +287,8 @@ HTML
         <label for="code">Code:</label>
         <input type="text" class="form-control" id="code" name="code" />
       </div>
-      <button
-        type="button"
-        class="btn btn-primary mt-2"
-        onclick="getFormValues()"
-      >
+      <button type="button" class="btn btn-primary mt-2" onclick="getFormValues('filter')">Filter</button>
+      <button type="button" class="btn btn-warning mt-2" onclick="getFormValues('clear')">Clear</button>
         Filter
       </button>
     </form>
@@ -295,21 +301,28 @@ JS
 
 ```js
 // Get values from form html and append to config -> re-render with new data
-const getFormValues = () => {
-  const formData = {};
-  const form = document.getElementById("filterForm");
+const getFormValues = (action) => {
+  if (action === "filter") {
+    const formData = {};
+    const form = document.getElementById("filterForm");
 
-  for (let i = 0; i < form.elements.length; i++) {
-    const element = form.elements[i];
+    for (let i = 0; i < form.elements.length; i++) {
+      const element = form.elements[i];
 
-    if (!element.name || element.tagName === "BUTTON") {
-      continue;
+      if (!element.name || element.tagName === "BUTTON") {
+        continue;
+      }
+
+      formData[element.name] = element.value;
     }
 
-    formData[element.name] = element.value;
+    config.filter = formData;
   }
 
-  config.filter = formData;
+  if (action === "clear") {
+    config.filter = {};
+  }
+  config.page = 1;
   tableData.updateConfig(config);
 };
 ```
@@ -347,14 +360,15 @@ $("#search_input").on("keyup", function () {
 
 ### 1. Functions to use:
 
-| Function             | Description                                                                                                                                      | Parameters                                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| tableData.cellEdit   | Used to initialize a cell that can be edited directly. Used in `config.rowRender`                                                                | tableData.cellEdit(colName, colValue). `colName` (the column name), `colValue` (the value of the cell) |
-| tableData.actionEdit | Used to initialize an edit button action to perform editing operations. Used in `config.rowRender` and usually declared in the `__actions` column. | tableData.actionEdit(row). `row` (the data of the row)             |
+| Function             | Description                                                                                                                                        | Parameters                                                                                             |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| tableData.cellEdit   | Used to initialize a cell that can be edited directly. Used in `config.rowRender`                                                                  | tableData.cellEdit(colName, colValue). `colName` (the column name), `colValue` (the value of the cell) |
+| tableData.actionEdit | Used to initialize an edit button action to perform editing operations. Used in `config.rowRender` and usually declared in the `__actions` column. | tableData.actionEdit(row). `row` (the data of the row)                                                 |
 
 ### 2. Example
 
-* `rowRender` in `config` variable
+- `rowRender` in `config` variable
+
 ```js
 rowRender: (colName, colValue, row) => {
   switch (colName) {
@@ -369,7 +383,8 @@ rowRender: (colName, colValue, row) => {
   }
 };
 ```
-* Result
+
+- Result
 
 ![OpenAI Logo](https://i.ibb.co/S36CYxj/Screenshot-2024-02-21-150628.png)
 
@@ -663,14 +678,16 @@ rowRender: (colName, colValue, row) => {
 }
 ```
 
-### *Note: The API that retrieves the data must ensure that the data returned is in the correct structure. Additionally, the sorting and filtering functions have been reconfigured. Information on handling APIs will be updated soon!.*
+### _Note: The API that retrieves the data must ensure that the data returned is in the correct structure. Additionally, the sorting and filtering functions have been reconfigured. Information on handling APIs will be updated soon!._
 
 ## Demo
 
 [Demo JDataTable](https://jsfiddle.net/joseph_le/eLx17fk9/880/)
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
 ## Authors
-#### Joseph Le
+
+[@JosephLe](https://github.com/luanlt632000)
